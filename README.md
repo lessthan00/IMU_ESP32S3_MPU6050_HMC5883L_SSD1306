@@ -165,6 +165,7 @@ N16->  16MB(QuadSPI) Flash
 R8-> 8MB PSRAM
 [ESP32-S3-WROOM-1 参考设计](https://www.espressif.com/sites/default/files/documentation/ESP32-S3-WROOM-1U_V1.4_Reference_Design.zip)
 [SPI2 硬件接口](https://docs.espressif.com/projects/esp-idf/zh_CN/stable/esp32s3/api-reference/peripherals/spi_master.html)
+[ESP32-S3](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf#cd-pins-io-mux-gpio)
 管脚名称
 
 ## SPI2 管脚对应表
