@@ -158,17 +158,18 @@ CH340G
 ESP32-S3FN8
 ESP32-S3-WROOM-1-N16R8
 
-## 数据手册
+## [H/W 硬件参考](https://docs.espressif.com/projects/esp-idf/zh_CN/stable/esp32s3/hw-reference/index.html)
 
 [ESP32-S3-WROOM-1 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_cn.pdf)
 N16->  16MB(QuadSPI) Flash
 R8-> 8MB PSRAM
 [ESP32-S3-WROOM-1 参考设计](https://www.espressif.com/sites/default/files/documentation/ESP32-S3-WROOM-1U_V1.4_Reference_Design.zip)
-[SPI2 硬件接口](https://docs.espressif.com/projects/esp-idf/zh_CN/stable/esp32s3/api-reference/peripherals/spi_master.html)
-[ESP32-S3](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf#cd-pins-io-mux-gpio)
-管脚名称
+[技术参考手册 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_cn.pdf)
+[技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)
 
-## SPI2 管脚对应表
+## SPI分配
+
+## [SPI2 管脚对应表](https://docs.espressif.com/projects/esp-idf/zh_CN/stable/esp32s3/api-reference/peripherals/spi_master.html#gpio-io-mux)
 
 | 管脚名称  | GPIO编号 (SPI2) |
 |----------|----------------|
@@ -178,3 +179,151 @@ R8-> 8MB PSRAM
 | MOSI     | 11             |
 | QUADWP   | 14             |
 | QUADHD   | 9              |
+
+### [技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)
+
+#### 第 30 章 SPI 控制器(SPI)
+
+#### 30.1 概述
+
+串行外设接口(SPI)是一种同步串行接口，可用于与外围设备进行通信。ESP32-S3芯片集成了四个SPI控制
+器：
+• SPI0
+ • SPI1
+ • 通用SPI2，即GP-SPI2
+ • 和通用SPI3，即GP-SPI3
+ SPI0 和 SPI1 控制器主要供内部使用以访问外部flash及PSRAM。本章节主要介绍GP-SPI控制器，即GP-SPI2
+和GP-SPI3。
+
+(所以毫无疑问应该选择SPI2)
+
+#### 30.5.8.3 主机全双工通信（仅支持1-bit模式）
+
+| Master (GP-SPI2) | Direction | Slave  |
+|------------------|-----------|--------|
+| FSPID            | →         | MOSI   |
+| FSPIQ            | ←         | MISO   |
+| FSPICLK          | →         | CLK    |
+| FSPICS0          | →         | CS     |
+
+#### 附录A–ESP32-S3管脚总览
+
+GPIO9 ~ GPIO14 并未高亮,说明无限制和关键作用,可以放心使用.
+
+## I2C 分配
+
+[技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)
+
+### 4.2.1.2 I2C 接口
+
+管脚分配
+I2C 的管脚可以为任意GPIO，通过GPIO交换矩阵配置。
+
+### 2.3.1 IO MUX 功能
+
+部分直接源自特定外设（U0TXD、MTCK等），包括UART0/1、JTAG、SPI0/1和SPI2
+
+(意味着I2C 并没有不通过IO MUX 矩阵的更特殊接口)
+
+### 2.3.2 RTC功能
+
+芯片处于Deep-sleep模式时，章节2.3.1IOMUX功能介绍的IO管脚功能无法使用。这正是引入RTCIOMUX
+的原因。RTCIO管脚连接RTC系统，由VDD3P3_RTC供电，使用RTCIOMUX能在Deep-sleep模式下让一个
+RTC输入/输出管脚连接多个输入/输出信号。
+
+| 管脚名称   | 功能            |
+|-----------|-----------------|
+| RTC_GPIO0 | sar_i2c_scl_0   |
+| RTC_GPIO1 | sar_i2c_sda_0   |
+| RTC_GPIO2 | sar_i2c_scl_1   |
+| RTC_GPIO3 | sar_i2c_sda_1   |
+
+RTC_GPIO0,RTC_GPIO3均被标记为黄色
+
+### [技术参考手册 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_cn.pdf)2.3.4 GPIO 和RTC_GPIO 的限制
+
+本章节的表格中，部分管脚功能有高亮标记。推荐优先使用没有高亮的GPIO或RTC_GPIO管脚。
+如需更多管脚，请谨慎选择高亮的GPIO或RTC_GPIO管脚，避免与重要功能冲突。
+
+### [技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)附录A–ESP32-S3管脚总览
+
+可知标黄原因:  
+GPIO0,复位时IE,WPU,复位后IE,WPU.
+GPIO3,复位时IE,复位后IE.
+所以编程需要注意,但可以选择这两个 I2C口.
+
+### 管脚配置一栏为复位时和复位后预设配置缩写
+
+•IE–输入使能
+•WPU–内部弱上拉电阻使能
+•WPD–内部弱下拉电阻使能
+• USB_PU–USB上拉电阻使能–USB管脚（GPIO19和GPIO20）默认开启USB功能，此时管脚是否上拉由USB上拉决定。USB上拉由USB_SERIAL_JTAG_DP/
+ DM_PULLUP控制，USB上拉电阻的具体阻值可通过USB_SERIAL_JTAG_PULLUP_VALUE位控制，详见《ESP32-S3技术参考手册》
+>章节USB串口/JTAG控制器。–USB管脚关闭USB功能时，用作普通GPIO，默认禁用管脚内部弱上/下拉电阻，可通过IO_MUX_FUN_WPU/WPD配置，
+详见《ESP32-S3技术参考手册》>章节IOMUX和GPIO交换矩阵。
+EFUSE_DIS_PAD_JTAG的值为
+• 0-弱上拉电阻使能
+• 1-管脚浮空
+
+## SSD1306 7PIN design
+
+[taobao](https://pan.baidu.com/s/1WhZjZDjIXnzRosZPsYRTPA?pwd=6666 )
+
+0.96村OLED SSD1306模块,7针接口定义 GND,VCC,D0,D1,RES,DC,CS
+
+| 引脚名称  | 描述                          | 备注                 |
+|----------|-----------------------------|---------------------|
+| GND      | 电源地                       |                     |
+| VCC      | 电源 (3.3V~5V)               | 工作电压范围         |
+| D0       | SPI时钟线 (SPI_CLK)          |                     |
+| D1       | SPI数据线 (SPI_MOSI)         |                     |
+| RES      | 复位信号                     |                     |
+| DC       | 数据/命令选择脚               |                     |
+| CS       | 片选信号 (低电平有效)         | 不可悬空             |
+
+## MPU6050 design
+
+copy from  [MPU6050](https://github.com/lessthan00/MPU6050)
+
+[JLC 页面](https://www.jlc-smt.com/lcsc/detail?componentCode=C24112)
+
+再次对比原理图封装无问题.
+对比芯片封装也无问题, 引脚间距0.5, QFN4x4mm, 热焊盘2.7x2.7, 打大过孔, 拉长焊盘,好焊接.
+
+[data sheet](https://item.szlcsc.com/datasheet/MPU-6050/24852.html)
+
+### 描述
+
+其数字运动处理器(DMP)提供的融合运动数据输出，大幅降低了对系统处理器频繁轮询传感器数据的需求。
+1024字节片上FIFO缓冲区通过让系统处理器突发读取传感器数据后进入低功耗模式，有效降低系统整体功耗。
+封装 4x4x0.9mm(QFN)
+MPU-6050仅支持I2C串行接口且设有独立VLOGIC引脚；
+3轴陀螺仪、3轴加速度计及数字运动处理器™(DMP)。通过专用I2C传感器总线，可直接接入外部3轴电子罗盘数据，输出完整的9轴MotionFusion™融合数据。
+
+### 7.2 Typical Operating Circuit
+
+对比电路图无问题,对比封装,无问题.
+
+I2C 上拉电阻4.7K, esp32 I2C 上拉电阻推荐(1K~5K)
+AD0 下拉到地, 简化电路, 固定I2C 地址.
+FSYNC 帧同步数字输入,不使用下拉到地.
+CLKIN 外部输入时钟信号,不使用下拉到地.
+INT 需要找一个引脚.
+
+### 9.2 I2C Interface  
+
+当MPU-60X0与系统处理器通信时，始终作为从机设备工作（此时系统处理器担任主机角色）。SDA和SCL线路通常需要上拉电阻连接至VDD电源，总线最高传输速率为400kHz。
+
+MPU-60X0的7位从机地址为b110100X，其中最低位（LSB）由AD0引脚的电平状态决定。这一特性支持将两个MPU-60X0设备连接到同一I2C总线：在此配置下，一个设备的地址应为b1101000（AD0引脚置为逻辑低电平），另一个设备的地址则为b1101001（AD0引脚置为逻辑高电平）。
+
+所以I2C地址为 b1101000 (0x68) (104)
+
+### DMP
+
+MPU-60X0系列芯片内置的数字运动处理器（DMP）可将运动处理算法的计算任务从主处理器卸载。该DMP能够从加速度计、陀螺仪及磁力计等第三方传感器获取数据并进行处理，处理结果既可通过DMP寄存器读取，也可存入FIFO缓冲区。DMP还可调用MPU的一个外部引脚来生成中断信号。
+
+DMP的核心价值在于为主处理器减轻时序处理负担并降低运算负荷。通常情况下，运动处理算法需以约200Hz的高频率运行才能保证低延迟的精确运算——即便应用层更新速率低至5Hz（如低功耗用户界面场景）也不例外。采用DMP可有效实现四大优势：降低系统功耗、简化时序控制、优化软件架构，并为应用程序节省宝贵的主处理器运算资源。
+
+(进一步了解发现好像DMP也没那么好用)
+
+## HMC5883L design
