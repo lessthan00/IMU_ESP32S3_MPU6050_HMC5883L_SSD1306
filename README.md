@@ -2,13 +2,13 @@
 
 ## 基于ESP32的IMU系统与OLED显示屏
 
-## 简介
+### 简介
 
 本项目实现了一个基于ESP32微控制器的惯性测量单元（IMU）系统，集成了MPU6050（6轴加速度计和陀螺仪）、HMC5883L（3轴磁力计）和SSD1306 OLED显示屏（128x64像素）。系统通过卡尔曼滤波融合传感器数据，实时计算并显示设备的俯仰（pitch）、滚转（roll）和偏航（yaw）角度，适用于机器人、无人机或可穿戴设备等需要精确姿态测量的场景。
 
-## 硬件要求
+### 硬件要求
 
-### 元件清单
+#### 元件清单
 
 | 元件                     | 描述                                   | 备注                              |
 |--------------------------|----------------------------------------|-----------------------------------|
@@ -22,7 +22,7 @@
 | 电源                     | 若不使用带USB的开发板需单独电源        | 3.3V                              |
 | USB转串口转换器          | 如CP2102或CH340，仅ESP32S3芯片需要     | 用于程序烧录                      |
 
-### 引脚接线图
+#### 引脚接线图
 
 所有传感器和显示屏通过I2C接口连接到ESP32的GPIO 21（SDA）和GPIO 22（SCL）。按钮连接到指定GPIO引脚。以下是详细接线表：
 
@@ -55,9 +55,9 @@
 
 **注意**：所有I2C设备（MPU6050、HMC5883L、SSD1306）共享相同的SDA和SCL线。按钮连接需使用内部上拉电阻或外部上拉电阻。
 
-## 软件结构
+### 软件结构
 
-### 程序结构框图
+#### 程序结构框图
 
 软件基于FreeRTOS实现多任务处理，包含以下并发任务：
 - **传感器任务**：以20 Hz频率从MPU6050和HMC5883L读取数据，发送到传感器队列。
@@ -74,7 +74,7 @@
 - **输出**：SSD1306 OLED显示屏
 - **同步机制**：使用FreeRTOS队列（`sensor_queue`、`attitude_queue`）和信号量（`i2c_mutex`、`ssd1306_mutex`、`calibration_done_sem`）进行任务间通信和资源保护。
 
-### 流程图
+#### 流程图
 
 1. **启动**：
    - 初始化ESP32S3外设（I2C、GPIO）
@@ -90,25 +90,30 @@
 4. **关机**：
    - 长按电源按钮，暂停任务并关闭系统
 
-## 传感器与显示屏简介
+### 传感器与显示屏简介
 
-### MPU6050
+#### MPU6050
+
 MPU6050是一个6轴惯性测量单元，包含3轴加速度计（量程±4g）和3轴陀螺仪（量程±500 dps）。它通过I2C通信（地址0x68或0x69），用于测量设备的俯仰和滚转角度。更多信息可参考 [MPU6050教程](https://www.instructables.com/Connecting-MPU6050-With-ESP32/)。
 
-### HMC5883L
+#### HMC5883L
+
 HMC5883L是一个3轴数字磁力计，用于测量磁场以确定偏航（罗盘方向）。它通过I2C通信（地址0x1E），支持倾斜补偿以提高精度。更多信息可参考 [HMC5883L与ESP32接口](https://circuitdigest.com/microcontroller-projects/diy-smartwatch-using-esp32-part3-interfacing-magnetometer-and-gyroscope-with-esp32)。
 
-### SSD1306 OLED显示屏
+#### SSD1306 OLED显示屏
+
 SSD1306是一个128x64像素的OLED显示屏，通过I2C通信，显示实时传感器数据，包括俯仰、滚转、偏航、加速度、陀螺仪和磁力计读数。支持绝对和相对模式，并可根据Z轴加速度自动翻转显示。更多信息可参考 [ESP32与SSD1306教程](https://randomnerdtutorials.com/esp32-ssd1306-oled-display-arduino-ide/)。
 
-## 使用说明
+### 使用说明
 
-### 硬件设置
+#### 硬件设置
+
 1. 按照引脚接线图连接MPU6050、HMC5883L、SSD1306和按钮到ESP32S3。
 2. 若使用ESP32S3芯片，连接USB转串口模块（TX、RX、CH_PD、EN、GND）。
 3. 使用面包板或PCB固定元件，确保3.3V电源稳定。
 
-### 程序烧录
+#### 程序烧录
+
 1. **使用ESP32S3开发板**：
    - 通过USB连接开发板到计算机。
    - 使用ESP-IDF或Arduino IDE（需安装ESP32支持）上传`main.c`程序。
@@ -116,19 +121,21 @@ SSD1306是一个128x64像素的OLED显示屏，通过I2C通信，显示实时传
    - 连接USB转串口模块（如CP2102或CH340）。
    - 使用ESP-IDF或Arduino IDE烧录程序，确保正确配置串口引脚。
 
-### 操作
+#### 操作
+
 - **开机**：短按电源按钮（GPIO 15）。
 - **关机**：长按电源按钮（>2秒）。
 - **模式切换**：按模式按钮（GPIO 16）切换绝对/相对测量模式。
 - **冻结显示**：按冻结按钮（GPIO 17）冻结/解冻显示。
 - **预留功能**：预留按钮（GPIO 18）为未来功能保留。
 
-## 调试与日志
+### 调试与日志
+
 - 系统使用ESP_LOG框架记录日志，标签为“mpu6050 test”和“SSD1306”。
 - 定期记录任务堆栈使用情况以监控内存使用。
 - 校准期间需保持设备静止（MPU6050）或缓慢旋转（HMC5883L）。
 
-## 当前存在的问题
+### 当前存在的问题
 
 1. **数据更新速度慢**：
    - 传感器任务以20 Hz频率生成数据，而处理任务和显示任务以5 Hz频率消费数据，导致生产速度快于消费速度，可能造成`sensor_queue`和`attitude_queue`队列满溢。日志中会记录“传感器队列已满”或“姿态队列已满”的警告。
@@ -138,14 +145,16 @@ SSD1306是一个128x64像素的OLED显示屏，通过I2C通信，显示实时传
    - 系统运行一段时间后，关机（长按电源按钮）并再次短按电源按钮可能无法正常开机，表现为任务未正确恢复或系统未完全初始化。
    - **潜在原因**：可能是任务挂起/恢复逻辑问题，或电源管理状态未正确重置。需要检查`button_task`中的任务恢复逻辑和硬件电源管理电路。
 
-## 未来展望
+### 未来展望
 
 1. **添加可视化更好的仪表界面**：
    - 当前SSD1306显示屏以文本形式显示数据，未来计划开发图形化仪表界面（如指针式仪表或3D姿态可视化），以提高用户体验。
    - 实现方式可能包括使用SSD1306的图形库绘制动态仪表盘，或升级到更高分辨率的显示屏（如SSD1327或彩色TFT屏）以支持更复杂的可视化。
    - 需优化显示任务以确保图形渲染不影响实时性能。
 
-## 物料
+## 硬件从新设计
+
+### 物料
 
 GY-521模块,MPU6050,接口定义VCC,GND,SCL,SDA,XDA,SCL,ADO,INT
 GY-271模块,HMC5883L,接口定义VCC,GND,SCL,SDA,DRDY
@@ -158,7 +167,7 @@ CH340G
 ESP32-S3FN8
 ESP32-S3-WROOM-1-N16R8
 
-## [H/W 硬件参考](https://docs.espressif.com/projects/esp-idf/zh_CN/stable/esp32s3/hw-reference/index.html)
+### [H/W 硬件参考](https://docs.espressif.com/projects/esp-idf/zh_CN/stable/esp32s3/hw-reference/index.html)
 
 [ESP32-S3-WROOM-1 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_cn.pdf)
 N16->  16MB(QuadSPI) Flash
@@ -167,9 +176,9 @@ R8-> 8MB PSRAM
 [技术参考手册 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_cn.pdf)
 [技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)
 
-## SPI分配
+### SPI分配
 
-## [SPI2 管脚对应表](https://docs.espressif.com/projects/esp-idf/zh_CN/stable/esp32s3/api-reference/peripherals/spi_master.html#gpio-io-mux)
+### [SPI2 管脚对应表](https://docs.espressif.com/projects/esp-idf/zh_CN/stable/esp32s3/api-reference/peripherals/spi_master.html#gpio-io-mux)
 
 | 管脚名称  | GPIO编号 (SPI2) |
 |----------|----------------|
@@ -180,11 +189,11 @@ R8-> 8MB PSRAM
 | QUADWP   | 14             |
 | QUADHD   | 9              |
 
-### [技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)
+#### [技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)
 
-#### 第 30 章 SPI 控制器(SPI)
+##### 第 30 章 SPI 控制器(SPI)
 
-#### 30.1 概述
+##### 30.1 概述
 
 串行外设接口(SPI)是一种同步串行接口，可用于与外围设备进行通信。ESP32-S3芯片集成了四个SPI控制
 器：
@@ -197,7 +206,7 @@ R8-> 8MB PSRAM
 
 (所以毫无疑问应该选择SPI2)
 
-#### 30.5.8.3 主机全双工通信（仅支持1-bit模式）
+##### 30.5.8.3 主机全双工通信（仅支持1-bit模式）
 
 | Master (GP-SPI2) | Direction | Slave  |
 |------------------|-----------|--------|
@@ -206,26 +215,26 @@ R8-> 8MB PSRAM
 | FSPICLK          | →         | CLK    |
 | FSPICS0          | →         | CS     |
 
-#### 附录A–ESP32-S3管脚总览
+##### 附录A–ESP32-S3管脚总览
 
 GPIO9 ~ GPIO14 并未高亮,说明无限制和关键作用,可以放心使用.
 
-## I2C 分配
+### I2C 分配
 
 [技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)
 
-### 4.2.1.2 I2C 接口
+#### 4.2.1.2 I2C 接口
 
 管脚分配
 I2C 的管脚可以为任意GPIO，通过GPIO交换矩阵配置。
 
-### 2.3.1 IO MUX 功能
+#### 2.3.1 IO MUX 功能
 
 部分直接源自特定外设（U0TXD、MTCK等），包括UART0/1、JTAG、SPI0/1和SPI2
 
 (意味着I2C 并没有不通过IO MUX 矩阵的更特殊接口)
 
-### 2.3.2 RTC功能
+#### 2.3.2 RTC功能
 
 芯片处于Deep-sleep模式时，章节2.3.1IOMUX功能介绍的IO管脚功能无法使用。这正是引入RTCIOMUX
 的原因。RTCIO管脚连接RTC系统，由VDD3P3_RTC供电，使用RTCIOMUX能在Deep-sleep模式下让一个
@@ -240,19 +249,19 @@ RTC输入/输出管脚连接多个输入/输出信号。
 
 RTC_GPIO0,RTC_GPIO3均被标记为黄色
 
-### [技术参考手册 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_cn.pdf)2.3.4 GPIO 和RTC_GPIO 的限制
+#### [技术参考手册 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_cn.pdf)2.3.4 GPIO 和RTC_GPIO 的限制
 
 本章节的表格中，部分管脚功能有高亮标记。推荐优先使用没有高亮的GPIO或RTC_GPIO管脚。
 如需更多管脚，请谨慎选择高亮的GPIO或RTC_GPIO管脚，避免与重要功能冲突。
 
-### [技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)附录A–ESP32-S3管脚总览
+#### [技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)附录A–ESP32-S3管脚总览
 
 可知标黄原因:  
 GPIO0,复位时IE,WPU,复位后IE,WPU.
 GPIO3,复位时IE,复位后IE.
 所以编程需要注意,但可以选择这两个 I2C口.
 
-### 管脚配置一栏为复位时和复位后预设配置缩写
+#### 管脚配置一栏为复位时和复位后预设配置缩写
 
 •IE–输入使能
 •WPU–内部弱上拉电阻使能
@@ -265,7 +274,7 @@ EFUSE_DIS_PAD_JTAG的值为
 • 0-弱上拉电阻使能
 • 1-管脚浮空
 
-## SSD1306 7PIN design
+### SSD1306 7PIN design
 
 [taobao](https://pan.baidu.com/s/1WhZjZDjIXnzRosZPsYRTPA?pwd=6666 )
 
@@ -281,7 +290,7 @@ EFUSE_DIS_PAD_JTAG的值为
 | DC       | 数据/命令选择脚               |                     |
 | CS       | 片选信号 (低电平有效)         | 不可悬空             |
 
-## MPU6050 design
+### MPU6050 design
 
 copy from  [MPU6050](https://github.com/lessthan00/MPU6050)
 
@@ -292,7 +301,7 @@ copy from  [MPU6050](https://github.com/lessthan00/MPU6050)
 
 [data sheet](https://item.szlcsc.com/datasheet/MPU-6050/24852.html)
 
-### 描述
+#### 描述
 
 其数字运动处理器(DMP)提供的融合运动数据输出，大幅降低了对系统处理器频繁轮询传感器数据的需求。
 1024字节片上FIFO缓冲区通过让系统处理器突发读取传感器数据后进入低功耗模式，有效降低系统整体功耗。
@@ -300,17 +309,17 @@ copy from  [MPU6050](https://github.com/lessthan00/MPU6050)
 MPU-6050仅支持I2C串行接口且设有独立VLOGIC引脚；
 3轴陀螺仪、3轴加速度计及数字运动处理器™(DMP)。通过专用I2C传感器总线，可直接接入外部3轴电子罗盘数据，输出完整的9轴MotionFusion™融合数据。
 
-### 7.2 Typical Operating Circuit
+#### 7.2 Typical Operating Circuit
 
 对比电路图无问题,对比封装,无问题.
 
-I2C 上拉电阻4.7K, esp32 I2C 上拉电阻推荐(1K~5K)
+I2C 上拉电阻10K
 AD0 下拉到地, 简化电路, 固定I2C 地址.
 FSYNC 帧同步数字输入,不使用下拉到地.
 CLKIN 外部输入时钟信号,不使用下拉到地.
 INT 需要找一个引脚.
 
-### 9.2 I2C Interface  
+#### 9.2 I2C Interface  
 
 当MPU-60X0与系统处理器通信时，始终作为从机设备工作（此时系统处理器担任主机角色）。SDA和SCL线路通常需要上拉电阻连接至VDD电源，总线最高传输速率为400kHz。
 
@@ -318,7 +327,7 @@ MPU-60X0的7位从机地址为b110100X，其中最低位（LSB）由AD0引脚的
 
 所以I2C地址为 b1101000 (0x68) (104)
 
-### DMP
+#### DMP
 
 MPU-60X0系列芯片内置的数字运动处理器（DMP）可将运动处理算法的计算任务从主处理器卸载。该DMP能够从加速度计、陀螺仪及磁力计等第三方传感器获取数据并进行处理，处理结果既可通过DMP寄存器读取，也可存入FIFO缓冲区。DMP还可调用MPU的一个外部引脚来生成中断信号。
 
@@ -326,4 +335,68 @@ DMP的核心价值在于为主处理器减轻时序处理负担并降低运算�
 
 (进一步了解发现好像DMP也没那么好用)
 
-## HMC5883L design
+### HMC5883L design
+
+[嘉立创 开发板模块资料](https://wiki.lckfb.com/zh-hans/esp32s3r8n8/module/sensor/hmc5883l-sensor.html)  
+[采购链接](https://detail.tmall.com/item.htm?abbucket=15&id=615355218813&ns=1)
+[HMC5883L资料下载链接](https://pan.baidu.com/s/1DfYH5OQHmD8zj1fMbI6ffg) 提取码：8888
+[数据手册](https://cdn-shop.adafruit.com/datasheets/HMC5883L_3-Axis_Digital_Compass_IC.pdf)
+
+#### HMC5883L description
+
+霍尼韦尔 HMC5883L 是一种表面贴装的高集成模块，并带有数字接口的弱磁传感器芯片，应用于低成本罗盘和磁场检测领域。HMC5883L 包括最先进的高分辨率 HMC118X 系列磁阻传感器，并附带霍尼韦尔专利的集成电路包括放大器、自动消磁驱动器、偏差校准、能使罗盘精度控制在 1°~2°的 12 位模数转换器.简易的 I2C 系列总线接口。HMC5883L 是采用无铅表面封装技术，带有16引脚，尺寸为3.0X3.0X0.9mm。
+低电压工作(2.16-3.6V)和超低功耗（100uA） 
+最大输出频率可达160Hz 
+
+#### 供电压选择
+
+如果选择1.8V 供电, 会导致IO口需要转电平
+3.3V 供电是可行的,所以选择3.3V供电.
+
+#### I2C 地址转换表
+
+| 地址类型       | 十六进制格式 | 二进制格式    | 十进制格式 |
+|----------------|--------------|---------------|------------|
+| 7位设备地址    | 0x1E         | `b001 1110`    | 30         |
+| 8位读取地址    | 0x3D         | `b0011 1101`   | 61         |
+| 8位写入地址    | 0x3C         | `b0011 1100`   | 60         |
+
+##### 7位地址 → 8位地址：
+
+- 7位地址直接使用低7位
+- 8位地址在7位地址前补0，并在末尾添加R/W位：
+- **写入地址** = (7位地址 << 1) | 0  
+   `0x1E << 1` = 0x3C  
+   `0x3C | 0` = 0x3C
+- **读取地址** = (7位地址 << 1) | 1  
+   `0x1E << 1` = 0x3C  
+   `0x3C | 1` = 0x3D
+
+#### 引脚配置
+
+| 引脚编号 | 引脚名称 | 描述                                                                 |
+|----------|----------|----------------------------------------------------------------------|
+| 1        | SCL      | 串行时钟 - I2C总线主/从时钟                                          |
+| 2        | VDD      | 电源（2.16V-3.6V）                                                   |
+| 3        | NC       | 无连接                                                               |
+| 4        | S1       | 连接 VDDIO                                                           |
+| 5        | NC       | 无连接                                                               |
+| 6        | NC       | 无连接                                                               |
+| 7        | NC       | 无连接                                                               |
+| 8        | SETP     | 置位/复位带正-S/R电容（C2）连接                                      |
+| 9        | GND      | 电源接地                                                             |
+| 10       | C1       | 存储电容器（C1）连接                                                 |
+| 11       | GND      | 电源接地                                                             |
+| 12       | SETC     | S/R电容器（C2）连接-驱动端                                           |
+| 13       | VDDIO    | IO电源供应（1.7V-VDD）                                               |
+| 14       | NC       | 无连接                                                               |
+| 15       | DRDY     | 数据准备，中断引脚。内部被拉高。当数据位于输出寄存器时会在低电位上停250μsec |
+| 16       | SDA      | 串行数据 - I2C总线主/从数据                                          |
+
+### 按照推荐电路图设计
+
+I2C上拉电阻选择为10K
+
+#### 主要担心
+
+封装太小,难以手焊接,数据手册推荐使用钢网焊接.可以试试.
