@@ -498,7 +498,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "IMU-ESP32S3-MPU6050-HMC5883L-SSD1306.kicad_pro",
+    "filename": "IMU_ESP32S3_MPU6050_HMC5883L_SSD1306.kicad_pro",
     "version": 3
   },
   "net_settings": {

@@ -169,10 +169,6 @@ ESP32-S3-WROOM-1-N16R8
 
 ### [H/W 硬件参考](https://docs.espressif.com/projects/esp-idf/zh_CN/stable/esp32s3/hw-reference/index.html)
 
-[ESP32-S3-WROOM-1 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_cn.pdf)
-N16->  16MB(QuadSPI) Flash
-R8-> 8MB PSRAM
-[ESP32-S3-WROOM-1 参考设计](https://www.espressif.com/sites/default/files/documentation/ESP32-S3-WROOM-1U_V1.4_Reference_Design.zip)
 [技术参考手册 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_cn.pdf)
 [技术规格书 (PDF)](https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_cn.pdf)
 
@@ -419,3 +415,19 @@ QMC5883L 是一款多芯片三轴磁传感器。这款表面贴装、小尺寸�
 
 低电压工作(2.16-3.6V)和超低功耗（75uA） 
 最大输出频率可达200Hz
+
+## ESP32-S3-WROOM-1 design
+
+因为还不会天线,可以先用 ESP32-S3-WROOM-1 模块来做.
+
+[ESP32-S3-WROOM-1 技术规格书](https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_cn.pdf)
+N16->  16MB(QuadSPI) Flash
+R8-> 8MB PSRAM
+[ESP32-S3-WROOM-1 参考设计](https://www.espressif.com/sites/default/files/documentation/ESP32-S3-WROOM-1U_V1.4_Reference_Design.zip)
+其他参考
+[jlc 开源1](https://oshwhub.com/yyhc/esp32-s3-12k-hu-xin-ban)
+[jlc 开源2](https://oshwhub.com/100askteam/yuzukiesp32_copy)
+[jlc 开源3](https://oshwhub.com/FJ956391150/esp32-wroom-32)
+[jlc 开源4](https://oshwhub.com/rockee/ESP32-S3-devkit)
+
+ESP32-S3 NXRX资料链接：https://pan.baidu.com/s/1KWFILTqv5Fio3_gVp5FfnQ?pwd=8889

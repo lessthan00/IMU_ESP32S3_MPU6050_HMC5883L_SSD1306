@@ -3419,6 +3419,16 @@
 		)
 		(uuid "ec29239c-aa7c-4e4d-b291-f7ecac5a71ba")
 	)
+	(text "DRDY 数据准备，中断引脚。内部被拉高"
+		(exclude_from_sim no)
+		(at 231.902 207.264 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "edb8aeb0-1693-4b75-a347-6adcfa5b8396")
+	)
 	(text "GPIO10"
 		(exclude_from_sim no)
 		(at 22.86 273.05 0)
@@ -3617,16 +3627,6 @@
 			(type default)
 		)
 		(uuid "26529349-9474-460e-bb89-b6580bd32b71")
-	)
-	(wire
-		(pts
-			(xy 232.41 201.93) (xy 250.19 201.93)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "272d81d3-949f-4c38-a8e8-011e354aa87f")
 	)
 	(wire
 		(pts
@@ -4370,6 +4370,16 @@
 	)
 	(wire
 		(pts
+			(xy 222.25 201.93) (xy 250.19 201.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e0be03d2-03d0-4542-9efe-b732c3a4f1e5")
+	)
+	(wire
+		(pts
 			(xy 20.32 262.89) (xy 57.15 262.89)
 		)
 		(stroke
@@ -4589,7 +4599,7 @@
 		(uuid "33818f4c-4de6-42eb-b622-d11f2bdfd927")
 	)
 	(label "DRDY"
-		(at 242.57 201.93 0)
+		(at 233.68 201.93 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -5375,7 +5385,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "4.7K"
+		(property "Value" "10K"
 			(at 210.82 189.2299 0)
 			(effects
 				(font
@@ -5828,7 +5838,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "4.7K"
+		(property "Value" "10K"
 			(at 219.71 189.2299 0)
 			(effects
 				(font
@@ -6031,7 +6041,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "4.7K"
+		(property "Value" "10K"
 			(at 39.37 187.9599 0)
 			(effects
 				(font
@@ -7334,7 +7344,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "4.7K"
+		(property "Value" "10K"
 			(at 30.48 187.9599 0)
 			(effects
 				(font
